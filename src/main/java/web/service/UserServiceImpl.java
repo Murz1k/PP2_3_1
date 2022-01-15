@@ -1,36 +1,51 @@
 package web.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 import web.dao.UserDao;
 import web.model.User;
 
+import javax.transaction.Transactional;
 import java.util.List;
-
+@Repository
 public class UserServiceImpl implements UserService{
+private final UserDao userDao;
 @Autowired
-private UserDao userDao;
+    public UserServiceImpl(UserDao userDao) {
+        this.userDao = userDao;
+    }
+
+
     @Override
-    public void addUser(User user) {
+    @Transactional
+    public void update(int id, User user) {
+    userDao.update(id, user);
 
     }
 
     @Override
-    public void updateUser(int id, User user) {
-
-    }
-
-    @Override
+    @Transactional// при использовании транзакшинал, спринг берет на себя ответсвенность за открытие и закрытие сессии
     public void removeUser(int id) {
-
+        userDao.removeUser(id);
     }
 
     @Override
+    @Transactional
     public User getUserById(int id) {
-        return null;
+        return userDao.getUserById(id);
     }
 
     @Override
+    @Transactional
     public List<User> getAllUsers() {
         return userDao.getAllUsers();
+    }
+
+    @Override
+    @Transactional
+    public void save(User user) {
+    userDao.save(user);
+
+
     }
 }

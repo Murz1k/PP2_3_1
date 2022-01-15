@@ -1,7 +1,5 @@
 package web.dao;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import web.model.User;
 
@@ -11,34 +9,42 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @Repository
-public class UserDaoImpl implements UserDao{
+public class UserDaoImpl implements UserDao {
     @PersistenceContext
     private EntityManager entityManager;
 
     @Override
-    public void addUser(User user) {
-
+    public void save(User user) {
+        entityManager.persist(user);
     }
 
     @Override
-    public void updateUser(int id, User user) {
+    public void update(int id, User user) {
+        User userToBeUpdated = entityManager.find(User.class, id);
+        userToBeUpdated.setName(user.getName());
+        userToBeUpdated.setLastName(user.getLastName());
+        userToBeUpdated.setEmail(user.getEmail());
+        entityManager.merge(user);
 
     }
 
     @Override
     public void removeUser(int id) {
-
+        User user = entityManager.find(User.class, id);
+        entityManager.remove(user);
     }
 
     @Override
     public User getUserById(int id) {
-        return null;
+
+        return entityManager.find(User.class, id);
+
     }
 
     @Override
-    @Transactional// при использовании транзакшинал, спринг берет на себя ответсвенность за открытие и закрытие сессии
     public List<User> getAllUsers() {// урок 070
-       List<User> allUsers = entityManager.createQuery("select user from User user", User.class).getResultList();
-        return allUsers;
+        List<User> userList = entityManager.createQuery("select user from User user",
+                User.class).getResultList();
+        return userList;
     }
 }

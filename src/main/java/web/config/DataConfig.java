@@ -1,7 +1,6 @@
 package web.config;
 
 
-
 import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -27,18 +26,14 @@ import java.util.Properties;
 @PropertySource("classpath:db.properties")
 @EnableTransactionManagement
 public class DataConfig {
-
-private final Environment environment;
     @Autowired
-    public DataConfig(Environment environment) {
-        this.environment = environment;
-    }
+    private Environment environment;
 
     @Bean
-    public LocalContainerEntityManagerFactoryBean entityManagerFactoryBean(){
+    public LocalContainerEntityManagerFactoryBean entityManagerFactoryBean() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
 
-        em.setDataSource(dataSource());
+        em.setDataSource(getDataSource());
         HibernateJpaVendorAdapter hibernateAdapter = new HibernateJpaVendorAdapter(); //  в качесте JPA провайдера используем хибер
         em.setJpaVendorAdapter(hibernateAdapter);
 
@@ -58,7 +53,7 @@ private final Environment environment;
     }
 
     @Bean
-    public DataSource dataSource(){
+    public DataSource getDataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setUrl(environment.getRequiredProperty("db.url"));
         dataSource.setDriverClassName(environment.getRequiredProperty("db.driver"));
@@ -70,9 +65,10 @@ private final Environment environment;
 
 
     @Bean
-    public TransactionManager transactionManager(EntityManagerFactory entityManagerFactory){   //????
+    public TransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
         JpaTransactionManager jpaTransactionManager = new JpaTransactionManager();
-        jpaTransactionManager.setDataSource(entityManagerFactoryBean().getDataSource());
+        jpaTransactionManager.setDataSource(getDataSource());
+        jpaTransactionManager.setEntityManagerFactory(entityManagerFactory);
         return jpaTransactionManager;
     }
 }
